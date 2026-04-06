@@ -5,24 +5,15 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install ESP-IDF
-      uses: espressif/setup-esp-idf@v2
-      with:
-        version: v6
-        install-python-deps: true
-
-    - name: Set ESP32-C5 target
-      run: echo "IDF_TARGET=esp32c5" >> $GITHUB_ENV
-
-    - name: Build Project
-      run: idf.py build
+      - name: Build with ESP‑IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: "latest"   # or a specific tag like v5.5
+          target: "esp32c5"
+          path: "."
