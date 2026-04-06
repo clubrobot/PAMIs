@@ -1,0 +1,28 @@
+name: ESP32-C5 CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install ESP-IDF
+      uses: espressif/setup-esp-idf@v2
+      with:
+        version: v6
+        install-python-deps: true
+
+    - name: Set ESP32-C5 target
+      run: echo "IDF_TARGET=esp32c5" >> $GITHUB_ENV
+
+    - name: Build Project
+      run: idf.py build
