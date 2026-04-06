@@ -1,0 +1,2 @@
+dependencies:
+  esp-idf-lib/pca9685: ^1.0.7
