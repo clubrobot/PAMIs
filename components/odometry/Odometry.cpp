@@ -111,3 +111,19 @@ float Odometry::getLinVel()
     }
     return v;
 }
+
+float Odometry::getAngVel()
+{
+    float v = 0;
+    if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
+    {
+        v = m_angVel;
+        xSemaphoreGive(m_mutex);
+    }
+    return v;
+}
+
+void Odometry::setSlippage(float slippage)
+{
+    m_slippage = slippage;
+}

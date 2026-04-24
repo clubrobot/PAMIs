@@ -71,7 +71,8 @@ float Codewheel::getTraveledDistance()
 float Codewheel::restart()
 {
     float distance = getTraveledDistance();
-    m_startCounter = m_currentCounter;
+    pcnt_unit_clear_count(m_pcnt_unit);
+    m_startCounter = 0;
     return distance;
 }
 
