@@ -1,0 +1,3 @@
+[submodule "components/motors"]
+	path = components/motors
+	url = https://github.com/clubrobot/motors
