@@ -30,7 +30,7 @@ void Odometry::init(AbstractCodewheel& left, AbstractCodewheel& right, float axl
         m_leftCodewheel->restart();
         m_rightCodewheel->restart();
 
-        xTaskCreate(taskLoop, "odom_task", 4096, nullptr, configMAX_PRIORITIES - 1, &m_taskHandle);
+        xTaskCreate(taskLoop, "odom_task", 4096, nullptr, 5, &m_taskHandle);
     }
 }
 
@@ -38,7 +38,7 @@ Position Odometry::getPosition()
 {
     Position p = {0, 0, 0};
 
-    if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(m_mutex, pdMS_TO_TICKS(5)) == pdTRUE)
     {
         p = m_pos;
         xSemaphoreGive(m_mutex);
@@ -48,7 +48,7 @@ Position Odometry::getPosition()
 
 void Odometry::setPosition(float x, float y, float theta)
 {
-    if (xSemaphoreTake(m_mutex, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(m_mutex, pdMS_TO_TICKS(5)) == pdTRUE)
     {
         m_pos = {x, y, theta};
         xSemaphoreGive(m_mutex);

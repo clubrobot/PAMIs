@@ -1,2 +1,4 @@
 dependencies:
   esp-idf-lib/pca9685: ^1.0.7
+  vl53l7cx:
+    git: https://github.com/RJRP44/VL53L7CX-Library.git

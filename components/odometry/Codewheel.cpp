@@ -5,7 +5,8 @@
 #include "Codewheel.h"
 
 
-Codewheel::Codewheel(int pin_a, int pin_b){
+Codewheel::Codewheel(int pin_a, int pin_b)
+{
     //Initialisation des valeurs avant le load
     m_currentCounter = 0;
     m_startCounter = 0;
@@ -17,7 +18,6 @@ Codewheel::Codewheel(int pin_a, int pin_b){
 
 void Codewheel::init()
 {
-
     pcnt_unit_config_t unit_config = {};
 
     unit_config.low_limit = -PCNT_LIMIT;
@@ -52,28 +52,34 @@ void Codewheel::init()
     ESP_ERROR_CHECK(pcnt_unit_enable(m_pcnt_unit));
     ESP_ERROR_CHECK(pcnt_unit_clear_count(m_pcnt_unit));
     ESP_ERROR_CHECK(pcnt_unit_start(m_pcnt_unit));
-
 }
 
-void Codewheel::reset(){
-    m_startCounter = 0;
-}
-
-void Codewheel::update(){
-    pcnt_unit_get_count(m_pcnt_unit, &m_currentCounter);
-}
-
-float Codewheel::getTraveledDistance()
+void Codewheel::reset()
 {
-    return (float)(getCounter() - m_startCounter) / m_countsPerRev * (2.0 * M_PI * m_wheelRadius);
+    m_startCounter = 0;
 }
 
 float Codewheel::restart()
 {
-    float distance = getTraveledDistance();
+    int rawCount = 0;
+    pcnt_unit_get_count(m_pcnt_unit, &rawCount);
+    float distance = (float)(rawCount - m_startCounter)
+        / (float)m_countsPerRev
+        * (2.0f * M_PI * m_wheelRadius);
     pcnt_unit_clear_count(m_pcnt_unit);
     m_startCounter = 0;
+    m_currentCounter = 0;
     return distance;
+}
+
+float Codewheel::getTraveledDistance()
+{
+    int rawCount = 0;
+    pcnt_unit_get_count(m_pcnt_unit, &rawCount);
+    m_currentCounter = rawCount;
+    return (float)(rawCount - m_startCounter)
+        / (float)m_countsPerRev
+        * (2.0f * M_PI * m_wheelRadius);
 }
 
 void Codewheel::setCountsPerRev(long countsPerRev)
@@ -81,7 +87,7 @@ void Codewheel::setCountsPerRev(long countsPerRev)
     m_countsPerRev = countsPerRev;
 }
 
-void Codewheel::setWheelRadius (float wheelRadius)
+void Codewheel::setWheelRadius(float wheelRadius)
 {
     m_wheelRadius = wheelRadius;
 }

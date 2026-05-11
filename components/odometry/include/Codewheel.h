@@ -24,7 +24,7 @@ public:
     * @brief renvoie le compteur de la roue codeuse
     * @return m_currentCounter
     */
-    int getCounter(){update(); return m_currentCounter;}
+    int getCounter(){return m_currentCounter;}
 
     /**
      * @brief Donne le nombre de tics par tour courant.

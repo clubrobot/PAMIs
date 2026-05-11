@@ -69,8 +69,19 @@ dependencies:
     source:
       type: idf
     version: 6.0.0
+  vl53l7cx:
+    component_hash: 66690ba3a63d34239b7e4d4aa642647dc217486a0f2979d1b617c152d8030eb9
+    dependencies:
+    - name: idf
+      version: '>=5.5.0'
+    source:
+      git: https://github.com/RJRP44/VL53L7CX-Library.git
+      path: .
+      type: git
+    version: 9901dbdad76e01f117aa36ca212ccdf9960128a0
 direct_dependencies:
 - esp-idf-lib/pca9685
-manifest_hash: 493e98ce4174e2e100ebe2456ae625e89622a9ff859c08e7d26a5685ac43c2c8
+- vl53l7cx
+manifest_hash: 6fab9f6de58ce19da1b8380db582bae2fc42ee3801d22e974f85effed930a52d
 target: esp32c5
 version: 3.0.0

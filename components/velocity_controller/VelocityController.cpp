@@ -16,8 +16,8 @@ float VelocityController::genRampSetpoint(float stepSetpoint, float input, float
 {
 	// If we are above the desired setpoint (i.e. the ramp), we no longer try to follow it.
 	// Instead we generate a new ramp starting from our current position.
-	if ((input - rampSetpoint) * (stepSetpoint - rampSetpoint) > 0)
-		rampSetpoint = input;
+	//if ((input - rampSetpoint) * (stepSetpoint - rampSetpoint) > 0)
+	//	rampSetpoint = input;
 
 	// Do we have to accelerate or deccelerate to reach the desired setpoint?
 	if (input * (stepSetpoint - input) >= 0)
@@ -26,8 +26,8 @@ float VelocityController::genRampSetpoint(float stepSetpoint, float input, float
 		rampSetpoint += sign(stepSetpoint - input) * maxDec * timestep;
 
 	// We clamp the ramp so that it never exceeds the real setpoint
-	//if ((stepSetpoint - input) * (stepSetpoint - rampSetpoint) < 0) // TODO: test if this condition runs well when rampSetpoint is set to INFINITY
-	//	rampSetpoint = stepSetpoint;
+	if ((stepSetpoint - input) * (stepSetpoint - rampSetpoint) < 0) // TODO: test if this condition runs well when rampSetpoint is set to INFINITY
+		rampSetpoint = stepSetpoint;
 
 	return rampSetpoint;
 }
@@ -82,8 +82,8 @@ void VelocityController::process(float timestep){
 	}
 		
 	// Restore setpoints
-	//m_linSetpoint = stepLinVelSetpoint;
-	//m_angSetpoint = stepAngVelSetpoint;
+	m_linSetpoint = stepLinVelSetpoint;
+	m_angSetpoint = stepAngVelSetpoint;
 }
 
 void VelocityController::onProcessEnabling()
