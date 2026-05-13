@@ -131,7 +131,7 @@ extern "C" void app_main(void)
 
     //xTaskCreatePinnedToCore(dc_test, TAG, configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, 0);
     //xTaskCreatePinnedToCore(codewheels_tests, TAG, configMINIMAL_STACK_SIZE * 10, NULL, 5, NULL, 0);
-
+/*
     codewheel_right.init();
 
     codewheel_left.init();
