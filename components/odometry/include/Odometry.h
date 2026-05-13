@@ -13,7 +13,7 @@
 #include "esp_timer.h"
 
 
-#define ODOMETRY_TIMESTEP 10
+#define ODOMETRY_TIMESTEP_ 10
 
 
 /**

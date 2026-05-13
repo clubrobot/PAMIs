@@ -57,7 +57,7 @@ void Odometry::setPosition(float x, float y, float theta)
 
 [[noreturn]] void Odometry::taskLoop(void* pvParameters)
 {
-    const TickType_t xDelay = pdMS_TO_TICKS(ODOMETRY_TIMESTEP);
+    const TickType_t xDelay = pdMS_TO_TICKS(ODOMETRY_TIMESTEP_);
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     while (true)

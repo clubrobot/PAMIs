@@ -177,7 +177,7 @@ namespace  Wheeledbase {
 
     void START_TURNONTHESPOT_DIR(bool dir, float theta);
 
-    void PUREPURSUIT(const Position** waypoints, uint16_t nb_waypoints, char dir, float finalAngle);
+    void PUREPURSUIT(const Position* waypoints, uint16_t nb_waypoints, char dir, float finalAngle);
 
     void GOTO(Position* pos, bool alignFirst=true, char dir=PurePursuit::NONE, float finalAngle=MAXFLOAT,bool bloquant=true);
 
@@ -193,13 +193,13 @@ namespace  Wheeledbase {
 
     void SET_POSITION(Position* pos);
 
-    const Position* GET_POSITION();
+    Position GET_POSITION();
 
     void GET_VELOCITIES(float *linVel, float *angVel);
 
-    void SET_PARAMETER_VALUE(byte paramID, float value);
+    void SET_PARAMETER_VALUE(uint8_t paramID, float value);
 
-    float GET_PARAMETER_VALUE(byte paramID);
+    float GET_PARAMETER_VALUE(uint8_t paramID);
 
     void PRINT_PARAMS();
 };

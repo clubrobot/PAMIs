@@ -1,6 +1,13 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#ifdef ESP_PLATFORM
+#include <cstdint>
+#include <cstring>
+#include <cstdio>
+#include <cstdarg>
+#endif
+
 #define NOBOLD 0
 #define BOLD 1
 

@@ -149,14 +149,14 @@ uint8_t Wheeledbase::POSITION_REACHED() {
     return ret;
 }
 
-void Wheeledbase::PUREPURSUIT(const Position** waypoints, uint16_t nb_waypoints, char dir, float finalAngle) {
+void Wheeledbase::PUREPURSUIT(const Position* waypoints, uint16_t nb_waypoints, char dir, float finalAngle) {
     if(nb_waypoints<2) {
         printf("[Purepursuit] not enough waypoints\n");
         return;
     }
     Wheeledbase::RESET_PUREPURSUIT();
     for(int i = 0; i < nb_waypoints; i++) {
-        Wheeledbase::ADD_PUREPURSUIT_WAYPOINT(waypoints[i]->x, waypoints[i]->y);
+        Wheeledbase::ADD_PUREPURSUIT_WAYPOINT(waypoints[i].x, waypoints[i].y);
     }
     Wheeledbase::START_PUREPURSUIT(dir, finalAngle);
 }
@@ -164,16 +164,16 @@ void Wheeledbase::PUREPURSUIT(const Position** waypoints, uint16_t nb_waypoints,
 void Wheeledbase::GOTO(Position* pos, bool alignFirst, char dir, float finalAngle,bool bloquant) {
     float defaultMaxSpeed = Wheeledbase::GET_PARAMETER_VALUE(POSITIONCONTROL_LINVELMAX_ID);
 
-    const Position *myPos = Wheeledbase::GET_POSITION();
+    Position myPos = Wheeledbase::GET_POSITION();
     if (dir==PurePursuit::NONE) {
-        if(cos(atan2(pos->y-myPos->y, pos->x-myPos->x)-myPos->theta)>=0) {
+        if(cos(atan2(pos->y-myPos.y, pos->x-myPos.x)-myPos.theta)>=0) {
             dir=PurePursuit::FORWARD;
         }else {
             dir=PurePursuit::BACKWARD;
 
         }
     }
-    const Position *posTab[2]={myPos, pos};
+    const Position posTab[2]={myPos, *pos};
 
     double maxSpeed = defaultMaxSpeed;
 
@@ -185,12 +185,12 @@ void Wheeledbase::GOTO(Position* pos, bool alignFirst, char dir, float finalAngl
         float x = pos->x + radius*cos(theta);
         float y = pos->y - radius*sin(theta);
         Position appr_pos = Position(x,y,pos->theta);
-        const Position *posApprTab[2]={myPos, &appr_pos};
+        const Position *posApprTab[2]={&myPos, &appr_pos};
 
-        Wheeledbase::PUREPURSUIT(posApprTab, 2, dir, pos->theta);
+        Wheeledbase::PUREPURSUIT(*posApprTab, 2, dir, pos->theta);
 
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", appr_pos.x, appr_pos.y, appr_pos.theta, posi->x, posi->y, posi->theta);
         }
 
@@ -199,7 +199,7 @@ void Wheeledbase::GOTO(Position* pos, bool alignFirst, char dir, float finalAngl
 
         Wheeledbase::PUREPURSUIT(posTab, 2, dir, pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01) && bloquant) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", pos->x, pos->y, pos->theta, posi->x, posi->y, posi->theta);
         }
 
@@ -237,8 +237,8 @@ void Wheeledbase::GOTO(Position* pos, bool alignFirst, char dir, float finalAngl
 void Wheeledbase::GOTO_WAYPOINTS(bool alignFirst, char dir, int nb_waypoints, ...){
     /////INIT VALEURS
 
-    const Position **posTab = (const Position**) malloc(sizeof(Position*) * nb_waypoints);
-    const Position* myPos = Wheeledbase::GET_POSITION();
+    Position *posTab = (Position*) malloc(sizeof(Position*) * nb_waypoints);
+    const Position myPos = Wheeledbase::GET_POSITION();
 
     int way_index = 0;
     posTab[0] = myPos;
@@ -272,24 +272,24 @@ void Wheeledbase::GOTO_WAYPOINTS(bool alignFirst, char dir, int nb_waypoints, ..
             }
         }
 
-        if (way_index==nb_waypoints-1 && alignFirst){posTab[way_index] = appr_pos;}
-        else{posTab[way_index] = curr_position;}
+        if (way_index==nb_waypoints-1 && alignFirst){posTab[way_index] = *appr_pos;}
+        else{posTab[way_index] = *curr_position;}
     }
 
     if (alignFirst){
         Wheeledbase::PUREPURSUIT(posTab, nb_waypoints, dir, appr_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", appr_pos.x, appr_pos.y, appr_pos.theta, posi->x, posi->y, posi->theta);
         }
 
         maxSpeed = maxSpeed > defaultMaxSpeed*0.1 ? maxSpeed * SLOWDOWN_FACTOR : maxSpeed;
         Wheeledbase::SET_PARAMETER_VALUE(POSITIONCONTROL_LINVELMAX_ID, maxSpeed);
 
-        const Position *finalPosTab[2]={myPos, last_pos};
+        const Position finalPosTab[2]={myPos, *last_pos};
         Wheeledbase::PUREPURSUIT(finalPosTab, 2, dir, last_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", pos->x, pos->y, pos->theta, posi->x, posi->y, posi->theta);
         }
 
@@ -298,7 +298,7 @@ void Wheeledbase::GOTO_WAYPOINTS(bool alignFirst, char dir, int nb_waypoints, ..
     }else{
         Wheeledbase::PUREPURSUIT(posTab, nb_waypoints, dir, last_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", appr_pos.x, appr_pos.y, appr_pos.theta, posi->x, posi->y, posi->theta);
         }
     }
@@ -309,8 +309,8 @@ void Wheeledbase::GOTO_WAYPOINTS(bool alignFirst, char dir, int nb_waypoints, ..
 void Wheeledbase::GOTO_WAYPOINTS_ARRAY(Position* positions[], bool alignFirst, char dir, int nb_waypoints){
     /////INIT VALEURS
 
-    const Position **posTab = (const Position**) malloc(sizeof(Position*) * nb_waypoints);
-    const Position* myPos = Wheeledbase::GET_POSITION();
+    Position *posTab = (Position*) malloc(sizeof(Position*) * nb_waypoints);
+    const Position myPos = Wheeledbase::GET_POSITION();
 
     int way_index = 0;
     posTab[0] = myPos;
@@ -342,24 +342,24 @@ void Wheeledbase::GOTO_WAYPOINTS_ARRAY(Position* positions[], bool alignFirst, c
             }
         }
 
-        if (way_index==nb_waypoints-1 && alignFirst){posTab[way_index] = appr_pos;}
-        else{posTab[way_index] = curr_position;}
+        if (way_index==nb_waypoints-1 && alignFirst){posTab[way_index] = *appr_pos;}
+        else{posTab[way_index] = *curr_position;}
     }
 
     if (alignFirst){
         Wheeledbase::PUREPURSUIT(posTab, nb_waypoints, dir, appr_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", appr_pos.x, appr_pos.y, appr_pos.theta, posi->x, posi->y, posi->theta);
         }
 
         maxSpeed = maxSpeed > defaultMaxSpeed*0.1 ? maxSpeed * SLOWDOWN_FACTOR : maxSpeed;
         Wheeledbase::SET_PARAMETER_VALUE(POSITIONCONTROL_LINVELMAX_ID, maxSpeed);
 
-        const Position *finalPosTab[2]={myPos, last_pos};
+        const Position finalPosTab[2]={myPos, *last_pos};
         Wheeledbase::PUREPURSUIT(finalPosTab, 2, dir, last_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", pos->x, pos->y, pos->theta, posi->x, posi->y, posi->theta);
         }
 
@@ -368,7 +368,7 @@ void Wheeledbase::GOTO_WAYPOINTS_ARRAY(Position* positions[], bool alignFirst, c
     }else{
         Wheeledbase::PUREPURSUIT(posTab, nb_waypoints, dir, last_pos->theta);
         while(!(Wheeledbase::POSITION_REACHED() & 0b01)) {
-            const Position *posi = Wheeledbase::GET_POSITION();
+            //const Position *posi = Wheeledbase::GET_POSITION();
             //printf("%f %f %f %f, %f, %f\n", appr_pos.x, appr_pos.y, appr_pos.theta, posi->x, posi->y, posi->theta);
         }
     }
@@ -382,16 +382,16 @@ void Wheeledbase::GOTO_FUNCT(Position* pos, void* duringMovingFunct, void* appro
     
     float defaultMaxSpeed = Wheeledbase::GET_PARAMETER_VALUE(POSITIONCONTROL_LINVELMAX_ID);
 
-    const Position *myPos = Wheeledbase::GET_POSITION();
+    const Position myPos = Wheeledbase::GET_POSITION();
     if (dir==PurePursuit::NONE) {
-        if(cos(atan2(pos->y-myPos->y, pos->x-myPos->x)-myPos->theta)>=0) {
+        if(cos(atan2(pos->y-myPos.y, pos->x-myPos.x)-myPos.theta)>=0) {
             dir=PurePursuit::FORWARD;
         }else {
             dir=PurePursuit::BACKWARD;
 
         }
     }
-    const Position *posTab[2]={myPos, pos};
+    const Position posTab[2]={myPos, *pos};
 
     double maxSpeed = defaultMaxSpeed;
 
@@ -403,7 +403,7 @@ void Wheeledbase::GOTO_FUNCT(Position* pos, void* duringMovingFunct, void* appro
         float x = pos->x - radius*cos(theta);
         float y = pos->y - radius*sin(theta);
         Position appr_pos = Position(x,y,pos->theta);
-        const Position *posApprTab[2]={myPos, &appr_pos};
+        const Position posApprTab[2]={myPos, appr_pos};
 
         Wheeledbase::PUREPURSUIT(posApprTab, 2, dir, pos->theta);
         first_funct();
@@ -469,17 +469,17 @@ void Wheeledbase::SET_POSITION(Position* pos) {
     Odometry::setPosition(pos->x, pos->y, pos->theta);
 }
 
-const Position Wheeledbase::GET_POSITION() {
+Position Wheeledbase::GET_POSITION() {
     const Position pos = Odometry::getPosition();
     return pos;
 }
 
 void Wheeledbase::GET_VELOCITIES(float* linVel, float* angVel) {
-    *linVel = odometry.getLinVel();
-    *angVel = odometry.getAngVel();
+    *linVel = Odometry::getLinVel();
+    *angVel = Odometry::getAngVel();
 }
 
-void Wheeledbase::SET_PARAMETER_VALUE(int paramID, float value) {
+void Wheeledbase::SET_PARAMETER_VALUE(uint8_t paramID, float value) {
     switch (paramID) {
     case LEFTWHEEL_RADIUS_ID:
         leftWheel.setWheelRadius(value);
@@ -588,7 +588,7 @@ void Wheeledbase::SET_PARAMETER_VALUE(int paramID, float value) {
 
 
 
-float Wheeledbase::GET_PARAMETER_VALUE(int paramID) {
+float Wheeledbase::GET_PARAMETER_VALUE(uint8_t paramID) {
     if (paramID == LEFTWHEEL_RADIUS_ID) {
         return leftWheel.getWheelRadius();
     }
@@ -616,10 +616,10 @@ float Wheeledbase::GET_PARAMETER_VALUE(int paramID) {
     }
 
     else if (paramID == ODOMETRY_AXLETRACK_ID) {
-        return odometry.getAxleTrack();
+        return Odometry::getAxleTrack();
     }
     else if (paramID == ODOMETRY_SLIPPAGE_ID) {
-        return odometry.getSlippage();
+        return Odometry::getSlippage();
     }
 
     else if (paramID == VELOCITYCONTROL_AXLETRACK_ID) {
