@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/CMakeFiles/bootloader
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/CMakeFiles/bootloader.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/CMakeFiles/bootloader-complete.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
