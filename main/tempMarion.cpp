@@ -13,23 +13,26 @@
            idf.py build    */
 //ne pas oublier les sous modules : https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules
 
-#include "components/clock/include/Clock.h"
+#include "../components//clock/include/Clock.h"
+#include "iot_servo.h"
 #include "driver/gpio.h"
 #include <cstdio>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 
 //espace pour les GPIOs de la esp32
-#define PIN_TIRETTE GPIO_?   //active qd ???
-#define PIN_EQUIPE  GPIO_?   //jaune ou bleu
+#define PIN_TIRETTE GPIO_NUM_24   //active qd ???
+#define PIN_EQUIPE  GPIO_NUM_8   //jaune ou bleu
 /*Pour le numéro du pami (il y aurait max 7 PAMIs donc 3bits (2^3-1))*/
-#define PIN_PAMI_0  GPIO_?
-#define PIN_PAMI_1  GPIO_?   
-#define PIN_PAMI_2  GPIO_?
-#define PIN_PAMI_Ninja  GPIO_?  
+#define PIN_PAMI_0  GPIO_NUM_25
+#define PIN_PAMI_1  GPIO_NUM_26
+#define PIN_PAMI_2  GPIO_NUM_27
 
-#define PIN_Servo   GPIO_?
+#define PIN_Servo1   GPIO_NUM_15
+#define PIN_Servo2   GPIO_NUM_23
 
-#define T_ATTENTE   80.5f   //80.5s avant de lancer les moteurs
+#define T_ATTENTE   85.5f   //85.5s avant de lancer les moteurs
 #define T_ARRET 100.0f  //100s arrêt total
 #define T_ServoMoteur   90.0f //on se dit qu'à 90s (10s du début des PAMIs, le PAMI curseur bouge son servomoteur)
 
@@ -64,7 +67,7 @@ void initServomoteur()//https://components.espressif.com/components/espressif/se
         .timer_number = LEDC_TIMER_0,
         .channels = {
             .servo_pin = {
-                PIN_Servo,
+                PIN_Servo1,
             },
             .ch = {
                 LEDC_CHANNEL_0,
@@ -171,7 +174,7 @@ extern "C" void app_main()
                             //pour comprendre : https://freertos.org/Documentation/02-Kernel/04-API-references/02-Task-control/01-vTaskDelay
     }
 
-    clock.restart();    //on remet t=0, début attente des 80.5s
+    clock.restart();    //on remet t=0, début attente des 85.5s
     printf("Départ du grand et beau robot, début attente PAMIs\n");
 
     bool vroumMoteurs = false; //au début, les moteurs ne sont pas lancés
@@ -193,7 +196,7 @@ extern "C" void app_main()
         //A 90s
         if (!tourneServo && t >= T_ServoMoteur)
         {
-            servoBouge = true; 
+            tourneServo = true;
             moveServomoteur();
             printf("Curseur en mouvement ? il faut être bien placé\n");
         }

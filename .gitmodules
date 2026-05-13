@@ -1,3 +1,6 @@
 [submodule "components/motors"]
 	path = components/motors
 	url = https://github.com/clubrobot/motors
+[submodule "motors"]
+	path = motors
+	url = git@github.com:clubrobot/motors.git
