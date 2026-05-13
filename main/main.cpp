@@ -30,6 +30,17 @@
 #define RIGHT_CODEWHEEL_A GPIO_NUM_1
 #define RIGHT_CODEWHEEL_B GPIO_NUM_3
 
+// Pin TOF
+#define TOF_FORWARD GPIO_NUM_11
+#define TOF_BACKWARD GPIO_NUM_12
+
+// Header
+#define TIRRETTE GPIO_NUM_24
+#define B0 GPIO_NUM_25
+#define B1 GPIO_NUM_26
+#define B2 GPIO_NUM_27
+#define TEAM GPIO_NUM_8
+
 static const char* TAG = "main";
 
 void dc_test(void *pvParameters)
