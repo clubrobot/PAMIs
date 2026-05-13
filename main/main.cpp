@@ -112,6 +112,8 @@ void dc_test(void *pvParameters)
     {
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
+*/
+
 }
 
 static uint8_t s_led_state = 0;
