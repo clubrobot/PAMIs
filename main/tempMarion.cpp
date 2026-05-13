@@ -6,10 +6,12 @@
 
 //librairie sur les servo moteurs sur expressif idf
 
+
+
 /*faire :  rm -rf build
            .  /home/marionlh/.espressif/v6.0/esp-idf/export.sh
            idf.py build    */
-
+//ne pas oublier les sous modules : https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules
 
 #include "components/clock/include/Clock.h"
 #include "driver/gpio.h"
