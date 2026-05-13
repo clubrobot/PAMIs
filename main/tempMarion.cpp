@@ -1,7 +1,7 @@
 // 6 PAMIs + 1 PAMI ninja
 /*Pour homologuer un  PAMI, avancer et s'arrêter à la détection d'un obstacle*/
 
-/*déclancher un timer (clock) faire un while tant qu'on a pas tiré la tirette, détecter variable d'équipe et du n° du PAMI 
+/*déclancher un timer (clock) faire un while tant qu'on a pas tiré la tirette, détecter variable d'équipe et du n° du PAMI
 (7 en tout avec le PAMI ninja), attendre 80,5s avant de lancer les moteurs, il doit s'arreter à 100s (il a 20s pour se mettre dans le garde mangé)*/
 
 //librairie sur les servo moteurs sur expressif idf
@@ -81,13 +81,12 @@ void initServomoteur()//https://components.espressif.com/components/espressif/se
 
     //set the angle
     uint16_t angle = 0;
-    iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle); 
+    iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
 
 }
 
-void moveServomoteur() //https://docs.espressif.com/projects/esp-iot-solution/en/latest/motor/servo.html                       
+void moveServomoteur(float angle) //https://docs.espressif.com/projects/esp-iot-solution/en/latest/motor/servo.html
 {
-    float angle = 150.0f; //set angle to 150 degree 
     iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
 }
 
@@ -119,37 +118,37 @@ int stratPami(const int numPami, const int equipe)  //stratégie de déplacement
     case 1:
         if (equipe==0){
         one_bleu();}
-        else{ 
+        else{
         one_jaune();}
         break;
     case 2:
         if (equipe==0){
         two_bleu();}
-        else{ 
+        else{
         two_jaune();}
         break;
     case 3:
         if (equipe==0){
         trois_bleu();}
-        else{ 
+        else{
         trois_jaune();}
         break;
     case 4:
         if (equipe==0){
         vier_bleu();}
-        else{ 
+        else{
         vier_jaune();}
         break;
     case 5:
         if (equipe==0){
         five_bleu();}
-        else{ 
+        else{
         five_jaune();}
         break;
     default: //PAMI ninja (numéro 6 = 7e PAMI)
         if (equipe==0){
         ninja_bleu();}
-        else{ 
+        else{
         ninja_jaune();}
         break;
     }
@@ -158,6 +157,19 @@ int stratPami(const int numPami, const int equipe)  //stratégie de déplacement
 
 extern "C" void app_main()
 {
+    gpio_reset_pin(PIN_TIRETTE);
+    gpio_reset_pin(PIN_EQUIPE);
+    gpio_reset_pin(PIN_PAMI_0);
+    gpio_reset_pin(PIN_PAMI_1);
+    gpio_reset_pin(PIN_PAMI_2);
+    gpio_set_direction(PIN_TIRETTE, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_EQUIPE, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_0, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_1, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_2, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(PIN_TIRETTE, GPIO_PULLDOWN_ONLY);
+
+    initServomoteur();
     //lire la config (équipe + ID PAMI)
     int equipe  = gpio_get_level(PIN_EQUIPE);
     int numPami  = calNumPami();
@@ -170,7 +182,7 @@ extern "C" void app_main()
 
     while (!(gpio_get_level(PIN_TIRETTE) == 0)) //à changer en fonction de qd active low ou high
     {
-        vTaskDelay(pdMS_TO_TICKS(10));    //lié à FreeRTOS, fonction pdMS_TO_TICKS utilisée dans Odometry.cpp  
+        vTaskDelay(pdMS_TO_TICKS(10));    //lié à FreeRTOS, fonction pdMS_TO_TICKS utilisée dans Odometry.cpp
                             //pour comprendre : https://freertos.org/Documentation/02-Kernel/04-API-references/02-Task-control/01-vTaskDelay
     }
 
@@ -197,7 +209,7 @@ extern "C" void app_main()
         if (!tourneServo && t >= T_ServoMoteur)
         {
             tourneServo = true;
-            moveServomoteur();
+            moveServomoteur(0.0);
             printf("Curseur en mouvement ? il faut être bien placé\n");
         }
 
@@ -206,7 +218,11 @@ extern "C" void app_main()
         {
             arreterMoteurs();
             printf("FIN du match, PAMI hopefully dans le garde manger\n");
-            break;
+            moveServomoteur(0);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            moveServomoteur(180);
+            vTaskDelay(pdMS_TO_TICKS(500));
+
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
