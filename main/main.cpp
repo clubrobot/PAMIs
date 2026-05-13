@@ -61,6 +61,37 @@ void dc_test(void *pvParameters)
 
     ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, PCA9685_FREQ));
 
+    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, TOF_FORWARD, PCA9685_HIGH));
+    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, TOF_BACKWARD, PCA9685_HIGH));
+
+    vTaskDelay(pdMS_TO_TICKS(150));
+/*
+    VL53L7CX_Configuration sensor;
+    VL53L7CX_ResultsData results;
+
+    vl53l7cx_init(&sensor);
+
+    vl53l7cx_set_resolution(&sensor, VL53L7CX_RESOLUTION_4X4);
+    vl53l7cx_start_ranging(&sensor);
+
+    while (true)
+    {
+        uint8_t ready = 0;
+
+        vl53l7cx_check_data_ready(&sensor, &ready);
+
+        if (ready)
+        {
+            vl53l7cx_get_ranging_data(&sensor, &results);
+
+            printf("Center: %d mm\n", results.distance_mm[5]);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+*/
+
+/*
 
     // Turn the left wheel forward
     ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, LEFT_MOTOR_FORWARD, PCA9685_HIGH));
