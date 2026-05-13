@@ -109,6 +109,19 @@ extern "C" void app_main(void)
     codewheel_right.setCountsPerRev(3840);
 
     Odometry::init(codewheel_left,codewheel_right,80);
+*/
+    gpio_reset_pin(TIRRETTE);
+    gpio_reset_pin(TEAM);
+    gpio_reset_pin(B0);
+    gpio_reset_pin(B1);
+    gpio_reset_pin(B2);
+    gpio_set_direction(TIRRETTE, GPIO_MODE_INPUT);
+    gpio_set_direction(TEAM, GPIO_MODE_INPUT);
+    gpio_set_direction(B0, GPIO_MODE_INPUT);
+    gpio_set_direction(B1, GPIO_MODE_INPUT);
+    gpio_set_direction(B2, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(TIRRETTE, GPIO_PULLDOWN_ONLY);
+
 
     while(true){
         Position p = Odometry::getPosition();
