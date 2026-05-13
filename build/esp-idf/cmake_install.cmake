@@ -724,6 +724,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/main/cmake_install.cmake")
 endif()
 

@@ -208,8 +208,11 @@
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__i2cdev/libesp-idf-lib__i2cdev.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__pca9685/libesp-idf-lib__pca9685.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__i2cdev/libesp-idf-lib__i2cdev.a
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/libespressif__servo.a
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/driver/libdriver.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/main/libmain.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__pca9685/libesp-idf-lib__pca9685.a
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/libespressif__servo.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/clock/libclock.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/mathutils/libmathutils.a
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/motors/libmotors.a

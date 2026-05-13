@@ -208,8 +208,11 @@ $<TARGET_FILE:idf::spiffs>
 $<TARGET_FILE:idf::esp-idf-lib__i2cdev>
 $<TARGET_FILE:idf::esp-idf-lib__pca9685>
 $<TARGET_FILE:__idf_esp-idf-lib__i2cdev>
+$<TARGET_FILE:idf::espressif__servo>
+$<TARGET_FILE:__idf_driver>
 $<TARGET_FILE:idf::main>
 $<TARGET_FILE:__idf_esp-idf-lib__pca9685>
+$<TARGET_FILE:__idf_espressif__servo>
 $<TARGET_FILE:idf::clock>
 $<TARGET_FILE:idf::mathutils>
 $<TARGET_FILE:idf::motors>

@@ -88,7 +88,36 @@ void moveServomoteur() //https://docs.espressif.com/projects/esp-iot-solution/en
     iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
 }
 
-//créer une fonction pour la statégie par PAMI grâce à leur num
+int stratPami(const numPami)  //stratégie des PAMI en fonction de leur num ET equipe
+{
+    switch (numPami)
+    {
+    case 0:
+        a();
+        break;
+    case 1:
+        a();
+        break;
+    case 2:
+        b();
+        break
+    case 3:
+        c();
+        break;
+    case 4:
+        a();
+        break;
+    case 5:
+        b();
+        break
+    default: //PAMI ninja (numéro 6 = 7e PAMI)
+        d();
+        break;
+    }
+    return 0;
+}
+
+
 
 extern "C" void app_main()
 {

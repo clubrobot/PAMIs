@@ -1106,6 +1106,13 @@
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__pca9685/CMakeFiles/install.dir
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__pca9685/CMakeFiles/install/local.dir
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/esp-idf-lib__pca9685/CMakeFiles/install/strip.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/__idf_espressif__servo.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/edit_cache.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/rebuild_cache.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/list_install_components.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/install.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/install/local.dir
+/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/espressif__servo/CMakeFiles/install/strip.dir
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/main/CMakeFiles/__idf_main.dir
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/main/CMakeFiles/edit_cache.dir
 /home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/esp-idf/main/CMakeFiles/rebuild_cache.dir
