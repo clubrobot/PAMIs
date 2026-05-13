@@ -124,8 +124,9 @@ extern "C" void app_main(void)
 
 
     while(true){
-        Position p = Odometry::getPosition();
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-        printf("%f,%f, %f \n",p.x,p.y, p.theta);
+        //Position p = Odometry::getPosition();
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        printf("Level Tirette = %i\tTEAM = %i\tB0 = %i\tB1 = %i\tB2 = %i\n",gpio_get_level(TIRRETTE),gpio_get_level(TEAM), gpio_get_level(B0), gpio_get_level(B1), gpio_get_level(B2));
+        //printf("%f,%f, %f \n",p.x,p.y, p.theta);
     }
 }
