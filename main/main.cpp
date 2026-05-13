@@ -49,7 +49,7 @@ void dc_test(void *pvParameters)
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     // Initialise i2c
-    dev.cfg.sda_io_num = PCA9685_SCL;
+    dev.cfg.sda_io_num = PCA9685_SDA;
     dev.cfg.scl_io_num = PCA9685_SCL;
     dev.cfg.sda_pullup_en = GPIO_PULLUP_ENABLE;
     dev.cfg.scl_pullup_en = GPIO_PULLUP_ENABLE;
