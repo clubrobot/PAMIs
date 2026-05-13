@@ -25,8 +25,8 @@ namespace wb
     Codewheel codewheel_right(RIGHT_CODEWHEEL_A, RIGHT_CODEWHEEL_B);
     Codewheel codewheel_left(LEFT_CODEWHEEL_B,LEFT_CODEWHEEL_A);
 
-    I2CDCDriver driver(LEFT_MOTOR_FORWARD, LEFT_MOTOR_BACKWARD, LEFT_MOTOR_PWM,
-                       RIGHT_MOTOR_FORWARD, RIGHT_MOTOR_BACKWARD, RIGHT_MOTOR_PWM, DRIVER_STBY);
+    I2CDCDriver driver(LEFT_MOTOR_FORWARD_, LEFT_MOTOR_BACKWARD_, LEFT_MOTOR_PWM_,
+                       RIGHT_MOTOR_FORWARD_, RIGHT_MOTOR_BACKWARD_, RIGHT_MOTOR_PWM_, DRIVER_STBY_);
 
     WheelMotor leftWheel(350);
     WheelMotor rightWheel(350);

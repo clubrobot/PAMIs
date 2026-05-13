@@ -19,6 +19,7 @@
 
 #include "sensors.h"
 #include "vl53l7cx_api.h"
+#include "Wheeledbase.h"
 
 static const char* TAG = "main";
 
