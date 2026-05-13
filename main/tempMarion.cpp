@@ -27,7 +27,7 @@
 #define PIN_PAMI_2  GPIO_?
 #define PIN_PAMI_Ninja  GPIO_?  
 
-#define PIN_Servo   ????
+#define PIN_Servo   GPIO_?
 
 #define T_ATTENTE   80.5f   //80.5s avant de lancer les moteurs
 #define T_ARRET 100.0f  //100s arrêt total
@@ -37,7 +37,7 @@ int calNumPami() //calcul du numéro du PAMI
 {
     //on a 3 bits pour des PAMIs de 0 à 7
     int id = 0;
-    id |= (gpio_get_level(PIN_PAMI_0) << 0) | gpio_get_level(PIN_PAMI_1) << 1) | gpio_get_level(PIN_PAMI_2) << 2);
+    id |= (gpio_get_level(PIN_PAMI_0) << 0) | (gpio_get_level(PIN_PAMI_1) << 1) | (gpio_get_level(PIN_PAMI_2) << 2);
     return id; //de 0 à 7 ça fait 8 PAMIs donc une des configs 3bits n'est pas utilisée
 }
 
@@ -53,7 +53,7 @@ void arreterMoteurs()
     // à remplir
 }
 
-voit initServomoteur()//https://components.espressif.com/components/espressif/servo/versions/0.1.0/readme
+void initServomoteur()//https://components.espressif.com/components/espressif/servo/versions/0.1.0/readme
 {
     //faire dans le terminal : idf.py add-dependency "espressif/servo^0.1.0"
         servo_config_t servo_cfg = {
@@ -64,7 +64,7 @@ voit initServomoteur()//https://components.espressif.com/components/espressif/se
         .timer_number = LEDC_TIMER_0,
         .channels = {
             .servo_pin = {
-                SERVO_GPIO,
+                PIN_Servo,
             },
             .ch = {
                 LEDC_CHANNEL_0,
@@ -88,36 +88,70 @@ void moveServomoteur() //https://docs.espressif.com/projects/esp-iot-solution/en
     iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
 }
 
-int stratPami(const numPami)  //stratégie des PAMI en fonction de leur num ET equipe
+void zero_bleu()  { /* à faire */ }
+void zero_jaune() { /* we can do it */ }
+void one_bleu()  { /* à faire */ }
+void one_jaune() { /* we can do it */ }
+void two_bleu()  { /* à faire */ }
+void two_jaune() { /* we can do it */ }
+void trois_bleu()  { /* à faire */ }
+void trois_jaune() { /* we can do it */ }
+void vier_bleu()  { /* à faire */ }
+void vier_jaune() { /* we can do it */ }
+void five_bleu()  { /* à faire */ }
+void five_jaune() { /* we can do it */ }
+void ninja_bleu()  { /* à faire */ }
+void ninja_jaune() { /* we can do it */ }
+
+int stratPami(const int numPami, const int equipe)  //stratégie de déplacement des PAMI en fonction de leur num ET equipe
 {
     switch (numPami)
     {
     case 0:
-        a();
+        if (equipe==0){  // 0 pour équipe jaune
+        zero_bleu();}
+        else{  // 1 équipe jaune
+        zero_jaune();}
         break;
     case 1:
-        a();
+        if (equipe==0){
+        one_bleu();}
+        else{ 
+        one_jaune();}
         break;
     case 2:
-        b();
-        break
+        if (equipe==0){
+        two_bleu();}
+        else{ 
+        two_jaune();}
+        break;
     case 3:
-        c();
+        if (equipe==0){
+        trois_bleu();}
+        else{ 
+        trois_jaune();}
         break;
     case 4:
-        a();
+        if (equipe==0){
+        vier_bleu();}
+        else{ 
+        vier_jaune();}
         break;
     case 5:
-        b();
-        break
+        if (equipe==0){
+        five_bleu();}
+        else{ 
+        five_jaune();}
+        break;
     default: //PAMI ninja (numéro 6 = 7e PAMI)
-        d();
+        if (equipe==0){
+        ninja_bleu();}
+        else{ 
+        ninja_jaune();}
         break;
     }
     return 0;
 }
-
-
 
 extern "C" void app_main()
 {
@@ -133,7 +167,7 @@ extern "C" void app_main()
 
     while (!(gpio_get_level(PIN_TIRETTE) == 0)) //à changer en fonction de qd active low ou high
     {
-        vTaskDelay(pdMS_TO_TICKS(10)));    //lié à FreeRTOS, fonction pdMS_TO_TICKS utilisée dans Odometry.cpp  
+        vTaskDelay(pdMS_TO_TICKS(10));    //lié à FreeRTOS, fonction pdMS_TO_TICKS utilisée dans Odometry.cpp  
                             //pour comprendre : https://freertos.org/Documentation/02-Kernel/04-API-references/02-Task-control/01-vTaskDelay
     }
 
@@ -141,8 +175,9 @@ extern "C" void app_main()
     printf("Départ du grand et beau robot, début attente PAMIs\n");
 
     bool vroumMoteurs = false; //au début, les moteurs ne sont pas lancés
-    initServomoteur();
-    
+    bool tourneServo = false; //de mm, flag pour faire tourner l'actionneur
+
+
     while (1)
     {
         float t=clock.getElapsedTime(); //temps en s
@@ -152,11 +187,13 @@ extern "C" void app_main()
         {
             vroumMoteurs = true; //lancement des moteurs
             lancerMoteurs();
+            stratPami(numPami, equipe);
         }
 
         //A 90s
-        if (t >= T_ServoMoteur)
+        if (!tourneServo && t >= T_ServoMoteur)
         {
+            servoBouge = true; 
             moveServomoteur();
             printf("Curseur en mouvement ? il faut être bien placé\n");
         }
