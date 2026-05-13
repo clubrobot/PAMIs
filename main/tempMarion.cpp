@@ -22,8 +22,8 @@
 
 
 //espace pour les GPIOs de la esp32
-#define PIN_TIRETTE GPIO_NUM_24   //active qd ???
-#define PIN_EQUIPE  GPIO_NUM_8   //jaune ou bleu
+#define PIN_TIRETTE GPIO_NUM_24   //active qd pin à 0 (qd il y a la tirette pin à 1)
+#define PIN_EQUIPE  GPIO_NUM_8   // = 0 qd jaune et = 1 qd bleu
 /*Pour le numéro du pami (il y aurait max 7 PAMIs donc 3bits (2^3-1))*/
 #define PIN_PAMI_0  GPIO_NUM_25
 #define PIN_PAMI_1  GPIO_NUM_26
