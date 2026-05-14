@@ -129,41 +129,67 @@ struct WBConstants
     const int DRIVER_FAULT;
 };
 
-// Global variables
-extern I2CDCDriver driver;
-extern WheelMotor leftWheel;
-extern WheelMotor rightWheel;
 
-extern Codewheel leftCodewheel;
-extern Codewheel rightCodewheel;
 
-extern Odometry odometry;
+namespace Wheeledbase
+{
 
-extern VelocityController velocityControl;
+    // Global variables
+    inline I2CDCDriver* driver = nullptr;
+    inline WheelMotor* leftWheel = nullptr;
+    inline WheelMotor* rightWheel = nullptr;
+    inline Codewheel* leftCodewheel = nullptr;
+    inline Codewheel* rightCodewheel = nullptr;
+    inline Odometry* odometry = nullptr;
+    inline VelocityController* velocityControl = nullptr;
+    inline PID* linVelPID = nullptr;
+    inline PID* angVelPID = nullptr;
+    inline PositionController* positionControl = nullptr;
+    inline PurePursuit* purePursuit = nullptr;
+    inline TurnOnTheSpot* turnOnTheSpot = nullptr;
 
-extern PID linVelPID;
-extern PID angVelPID;
+    inline Logger wb_logger = Logger("WHEELEDBASE");
 
-extern PositionController positionControl;
+    inline void INIT(
+       I2CDCDriver*        _driver,
+       WheelMotor*         _leftWheel,
+       WheelMotor*         _rightWheel,
+       Codewheel*          _leftCodewheel,
+       Codewheel*          _rightCodewheel,
+       VelocityController* _velocityControl,
+       PID*                _linVelPID,
+       PID*                _angVelPID,
+       PositionController* _positionControl,
+       PurePursuit*        _purePursuit,
+       TurnOnTheSpot*      _turnOnTheSpot,
+       Odometry* _odometry
+   ) {
+        driver          = _driver;
+        leftWheel       = _leftWheel;
+        rightWheel      = _rightWheel;
+        leftCodewheel   = _leftCodewheel;
+        rightCodewheel  = _rightCodewheel;
+        velocityControl = _velocityControl;
+        linVelPID       = _linVelPID;
+        angVelPID       = _angVelPID;
+        positionControl = _positionControl;
+        purePursuit     = _purePursuit;
+        turnOnTheSpot   = _turnOnTheSpot;
+        odometry = _odometry;
+    }
 
-extern PurePursuit   purePursuit;
-extern TurnOnTheSpot turnOnTheSpot;
-
-inline Logger wb_logger = Logger("WHEELEDBASE");
-
-namespace  Wheeledbase {
     // Instructions prototypes
     void DISABLE();
 
-    void GOTO_DELTA(float dx, float dy, bool bloquant=true); //bloquant: do we pass at the next step after ?
+    void GOTO_DELTA(float dx, float dy, bool bloquant = true); //bloquant: do we pass at the next step after ?
 
-    void TURNTO_DELTA(float dtheta, bool bloquant=true);
+    void TURNTO_DELTA(float dtheta, bool bloquant = true);
 
     //void TENTATIVE_POUR_PLUSTARD();
 
     void SET_OPENLOOP_VELOCITIES(float leftWheelVel, float rightWheelVel);
 
-    void GET_CODEWHEELS_COUNTERS(float *leftCodewheelCounter, float *rightCodewheelCounter);
+    void GET_CODEWHEELS_COUNTERS(float* leftCodewheelCounter, float* rightCodewheelCounter);
 
     void SET_VELOCITIES(float linVelSetpoint, float angVelSetpoint);
 
@@ -179,23 +205,26 @@ namespace  Wheeledbase {
 
     void PUREPURSUIT(const Position* waypoints, uint16_t nb_waypoints, char dir, float finalAngle);
 
-    void GOTO(Position* pos, bool alignFirst=true, char dir=PurePursuit::NONE, float finalAngle=MAXFLOAT,bool bloquant=true);
+    void GOTO(Position* pos, bool alignFirst = true, char dir = PurePursuit::NONE, float finalAngle = MAXFLOAT,
+              bool bloquant = true);
 
-    void GOTO_WAYPOINTS(bool alignFirst=true, char dir=PurePursuit::NONE, int nb_waypoints=1, ...);
+    void GOTO_WAYPOINTS(bool alignFirst = true, char dir = PurePursuit::NONE, int nb_waypoints = 1, ...);
 
-    void GOTO_WAYPOINTS_ARRAY(Position* positions[], bool alignFirst=true, char dir=PurePursuit::NONE, int nb_waypoints=1);
+    void GOTO_WAYPOINTS_ARRAY(Position* positions[], bool alignFirst = true, char dir = PurePursuit::NONE,
+                              int nb_waypoints = 1);
 
-    void GOTO_FUNCT(Position* pos, void* duringMovingFunct, void* approachFunct, bool alignFirst=true, char dir=PurePursuit::NONE, float finalAngle=MAXFLOAT);
+    void GOTO_FUNCT(Position* pos, void* duringMovingFunct, void* approachFunct, bool alignFirst = true,
+                    char dir = PurePursuit::NONE, float finalAngle = MAXFLOAT);
 
     uint8_t POSITION_REACHED();
 
-    void GET_VELOCITIES_WANTED(float *linOutput, float *angOutput, bool spin=true);
+    void GET_VELOCITIES_WANTED(float* linOutput, float* angOutput, bool spin = true);
 
     void SET_POSITION(Position* pos);
 
     Position GET_POSITION();
 
-    void GET_VELOCITIES(float *linVel, float *angVel);
+    void GET_VELOCITIES(float* linVel, float* angVel);
 
     void SET_PARAMETER_VALUE(uint8_t paramID, float value);
 
@@ -203,7 +232,6 @@ namespace  Wheeledbase {
 
     void PRINT_PARAMS();
 };
-
 
 
 #endif //WHEELEDBASE_H

@@ -3,6 +3,7 @@
 
 #include "PeriodicProcess.h"
 #include "Odometry.h"
+#include <math.h>
 
 class AbstractMoveStrategy;
 /**

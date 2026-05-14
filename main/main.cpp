@@ -6,10 +6,9 @@
 #include "esp_log.h"
 #include "i2cdev.h"
 #include "sdkconfig.h"
-#include "wheeledbase_.h"
+#include "wheeledbase.h"
 #include "Teleplot.h"
 #include "include/tasks.h"
-#include "Wheeledbase.h"
 
 #define PCA9685_ADDR 0x70
 #define PCA9685_FREQ 1526
@@ -24,11 +23,12 @@
 
 static const char* TAG = "main";
 
+static i2c_dev_t dev = {};
+
 extern "C" void app_main(void)
 {
     i2cdev_init();
 
-    i2c_dev_t dev = {};
     dev.cfg.sda_io_num = PCA9685_SDA;
     dev.cfg.scl_io_num = PCA9685_SCL;
     dev.cfg.sda_pullup_en = GPIO_PULLUP_ENABLE;
@@ -69,10 +69,18 @@ extern "C" void app_main(void)
 
 
 
+    Position p(500,0, 0);
+
+    Wheeledbase::GOTO_DELTA(500,0, true);
+    wb::velocityControl.enable();
+    //wb::velocityControl.setSetpoints(100,0);
+    //wb::
+
     for (;;)
     {
 
-        wb::velocityControl.setSetpoints(300,0);
-        vTaskDelay(500);
+        //Wheeledbase::SET_OPENLOOP_VELOCITIES(100,100);
+        //Wheeledbase::SET_OPENLOOP_VELOCITIES(100,0);
+        vTaskDelay(1000);
     }
 }

@@ -4,6 +4,8 @@
 
 #include "Codewheel.h"
 
+#include <math.h>
+
 
 Codewheel::Codewheel(int pin_a, int pin_b)
 {

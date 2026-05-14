@@ -6,11 +6,12 @@
 #include "PositionController.h"
 #include "VelocityController.h"
 #include "Odometry.h"
-#include "wheeledbase_.h"
+#include "wheeledbase.h"
 
 #include "Codewheel.h"
 #include "I2CDCDriver.h"
 #include "Teleplot.h"
+#include "Wheeledbase.h"
 #include "WheelMotor.h"
 
 namespace wb
@@ -21,6 +22,7 @@ namespace wb
     PID linVelPID;
     PID angVelPID;
 
+    Odometry odometry;
 
     Codewheel codewheel_right(RIGHT_CODEWHEEL_A, RIGHT_CODEWHEEL_B);
     Codewheel codewheel_left(LEFT_CODEWHEEL_B,LEFT_CODEWHEEL_A);
@@ -31,13 +33,16 @@ namespace wb
     WheelMotor leftWheel(350);
     WheelMotor rightWheel(350);
 
+    PurePursuit pure_pursuit;
+    TurnOnTheSpot turn_on_the_spot;
+
 
     void init(i2c_dev_t* dev)
     {
         leftWheel.setWheelRadius(25.172188481);
         rightWheel.setWheelRadius(25.172188481);
-        leftWheel.setConstant(0.3954);
-        rightWheel.setConstant(0.3954);
+        leftWheel.setConstant(0.5);
+        rightWheel.setConstant(0.5);
 
         driver.init(dev);
 
@@ -56,8 +61,9 @@ namespace wb
         codewheel_left.setCountsPerRev(3840);
         codewheel_right.setCountsPerRev(3840);
 
-        Odometry::init(codewheel_left, codewheel_right, 80);
-        Odometry::setSlippage(0);
+        odometry.setCodewheels(codewheel_left, codewheel_right);
+        odometry.setAxleTrack(80);
+        odometry.setSlippage(0);
 
         velocityControl.setWheels(leftWheel, rightWheel);
 
@@ -69,44 +75,70 @@ namespace wb
         velocityControl.setMaxAngAcc(3.14);
         velocityControl.setMaxAngDec(3.14);
 
+        odometry.setTimestep(20);
+        velocityControl.setTimestep(20);
+        positionControl.setTimestep(20);
+
+
         velocityControl.setSpinShutdown(false);
 
-        linVelPID.setTunings(1, 0, 0);
+        linVelPID.setTunings(4, 0, 0);
         linVelPID.setOutputLimits(-400, 400);
 
-        angVelPID.setTunings(1, 0, 0);
+        angVelPID.setTunings(4, 0, 0);
         angVelPID.setOutputLimits(-18.0278 / 2, 18.0278 / 2);
 
         positionControl.setVelLimits(350, 10);
         positionControl.setPosThresholds(6, 0.1);
-        
+
+        odometry.enable();
+
+        Wheeledbase::INIT(&driver, &leftWheel, &rightWheel, &codewheel_right, &codewheel_left, &velocityControl, &linVelPID, &angVelPID, &positionControl, &pure_pursuit, &turn_on_the_spot, &odometry);
     }
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xDelay = pdMS_TO_TICKS(10);
 
-    void task(void* pvParameters)
-    {
-        for (;;)
-        {
-            vTaskDelayUntil(&xLastWakeTime, xDelay);
+
+    #define SMOOTHING_FACTOR 0.2
+
+    float smoothLinVel = 0;
+    float smoothAngVel = 0;
+
+    void task(void *pvParameters){
+        for(;;) {
             // Update odometry
-            positionControl.setPosInput(Odometry::getPosition());
+            if (odometry.update()){
 
-            velocityControl.setInputs(Odometry::getLinVel(), Odometry::getAngVel());
+                smoothLinVel = SMOOTHING_FACTOR * odometry.getLinVel() + (1 - SMOOTHING_FACTOR) * smoothLinVel;
+                smoothAngVel = SMOOTHING_FACTOR * odometry.getAngVel() + (1 - SMOOTHING_FACTOR) * smoothAngVel;
 
+                positionControl.setPosInput(*odometry.getPosition());
+                velocityControl.setInputs(smoothLinVel, smoothAngVel);
+            }
+            // Compute trajectory
             if (positionControl.update())
             {
                 float linVelSetpoint = positionControl.getLinVelSetpoint();
                 float angVelSetpoint = positionControl.getAngVelSetpoint();
                 velocityControl.setSetpoints(linVelSetpoint, angVelSetpoint);
             }
+            // Integrate engineering control
 #if ENABLE_VELOCITYCONTROLLER_LOGS
             if (velocityControl.update())
                 controllerLogs.update();
 #else
             velocityControl.update();
 #endif // ENABLE_VELOCITYCONTROLLER_LOGS
+
+            vTaskDelay(pdMS_TO_TICKS(10));
+
+            //printf("%s:%lu:%d\n", "nom_variable", millis(), millis()%10000);
+
+            const Position* p = odometry.getPosition();
+
+            printf("%f, %f, %f\n", p->x, p->y, p->theta);
         }
     }
+
 }

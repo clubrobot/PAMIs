@@ -8,13 +8,13 @@ float Clock::getElapsedTime()
 {
     int64_t currentTime = esp_timer_get_time();
     // Calcul direct en microsecondes, puis conversion en secondes
-    return static_cast<float>(currentTime - m_startTime) / 1000000.0f;
+    return static_cast<float>(currentTime - m_startTime) / 1000.0f;
 }
 
 float Clock::restart()
 {
     int64_t currentTime = esp_timer_get_time();
-    float elapsedTimeInSeconds = static_cast<float>(currentTime - m_startTime) / 1000000.0f;
+    float elapsedTimeInSeconds = static_cast<float>(currentTime - m_startTime) / 1000.0f;
     m_startTime = currentTime;
     return elapsedTimeInSeconds;
 }
