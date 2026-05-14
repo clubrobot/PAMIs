@@ -78,7 +78,7 @@ dependencies:
   idf:
     source:
       type: idf
-    version: 6.0.0
+    version: 6.0.1
 direct_dependencies:
 - esp-idf-lib/pca9685
 - espressif/servo

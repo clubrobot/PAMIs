@@ -1,165 +1,232 @@
-#include <cstdio>
+// 6 PAMIs + 1 PAMI ninja
+/*Pour homologuer un  PAMI, avancer et s'arrêter à la détection d'un obstacle*/
 
-#include "Codewheel.h"
+/*déclancher un timer (clock) faire un while tant qu'on a pas tiré la tirette, détecter variable d'équipe et du n° du PAMI 
+(7 en tout avec le PAMI ninja), attendre 80,5s avant de lancer les moteurs, il doit s'arreter à 100s (il a 20s pour se mettre dans le garde mangé)*/
+
+//librairie sur les servo moteurs sur expressif idf
+
+
+
+/*faire :  rm -rf build
+           .  /home/marionlh/.espressif/v6.0/esp-idf/export.sh
+           idf.py build    */
+//ne pas oublier les sous modules : https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules
+
+#include "../components//clock/include/Clock.h"
+#include "iot_servo.h"
+#include "driver/gpio.h"
+#include <cstdio>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "i2cdev.h"
-#include "pca9685.h"
-#include "sdkconfig.h"
-#include "driver/pulse_cnt.h"
 
-#define LEFT_MOTOR_FORWARD 0
-#define LEFT_MOTOR_BACKWARD 1
-#define LEFT_MOTOR_PWM 2
-#define RIGHT_MOTOR_FORWARD 5
-#define RIGHT_MOTOR_BACKWARD 4
-#define RIGHT_MOTOR_PWM 6
-#define DRIVER_STBY 8
 
-#define PCA9685_ADDR 0x70
-#define PCA9685_FREQ 1526
-#define PCA9685_HIGH 4096
-#define PCA9685_LOW 0
-#define PCA9685_SDA GPIO_NUM_10
-#define PCA9685_SCL GPIO_NUM_9
+//espace pour les GPIOs de la esp32
+#define PIN_TIRETTE GPIO_NUM_24   //active qd ???
+#define PIN_EQUIPE  GPIO_NUM_8   //jaune ou bleu
+/*Pour le numéro du pami (il y aurait max 7 PAMIs donc 3bits (2^3-1))*/
+#define PIN_PAMI_0  GPIO_NUM_25
+#define PIN_PAMI_1  GPIO_NUM_26
+#define PIN_PAMI_2  GPIO_NUM_27
 
-#define LEFT_CODEWHEEL_A GPIO_NUM_0
-#define LEFT_CODEWHEEL_B GPIO_NUM_2
-#define RIGHT_CODEWHEEL_A GPIO_NUM_1
-#define RIGHT_CODEWHEEL_B GPIO_NUM_3
+#define PIN_Servo1   GPIO_NUM_15
+#define PIN_Servo2   GPIO_NUM_23
 
-// Pin TOF
-#define TOF_FORWARD GPIO_NUM_11
-#define TOF_BACKWARD GPIO_NUM_12
+#define T_ATTENTE   85.5f   //85.5s avant de lancer les moteurs
+#define T_ARRET 100.0f  //100s arrêt total
+#define T_ServoMoteur   90.0f //on se dit qu'à 90s (10s du début des PAMIs, le PAMI curseur bouge son servomoteur)
 
-// Header
-#define TIRRETTE GPIO_NUM_24
-#define B0 GPIO_NUM_25
-#define B1 GPIO_NUM_26
-#define B2 GPIO_NUM_27
-#define TEAM GPIO_NUM_8
-
-static const char* TAG = "main";
-
-void dc_test(void *pvParameters)
+int calNumPami() //calcul du numéro du PAMI
 {
-    i2c_dev_t dev;
-    memset(&dev, 0, sizeof(i2c_dev_t));
+    //on a 3 bits pour des PAMIs de 0 à 7
+    int id = 0;
+    id |= (gpio_get_level(PIN_PAMI_0) << 0) | (gpio_get_level(PIN_PAMI_1) << 1) | (gpio_get_level(PIN_PAMI_2) << 2);
+    return id; //de 0 à 7 ça fait 8 PAMIs donc une des configs 3bits n'est pas utilisée
+}
 
-    // Initialise i2c
-    dev.cfg.sda_io_num = PCA9685_SDA;
-    dev.cfg.scl_io_num = PCA9685_SCL;
-    dev.cfg.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    dev.cfg.scl_pullup_en = GPIO_PULLUP_ENABLE;
+void lancerMoteurs()
+{
+    printf("3, 2, 1 ... action des moteurs !\n");
+    // à remplir, regarder dans VelocityController
+}
 
-    // Initialise i2c pwm controller, pca9685
-    ESP_ERROR_CHECK(pca9685_init_desc(&dev, PCA9685_ADDR, I2C_NUM_0, GPIO_NUM_10, GPIO_NUM_9));
-    ESP_ERROR_CHECK(pca9685_init(&dev));
-    ESP_ERROR_CHECK(pca9685_restart(&dev));
+void arreterMoteurs()
+{
+    printf("Arrêt des 2 moteurs\n");
+    // à remplir
+}
 
-    ESP_ERROR_CHECK(pca9685_set_pwm_frequency(&dev, PCA9685_FREQ));
+void initServomoteur()//https://components.espressif.com/components/espressif/servo/versions/0.1.0/readme
+{
+    //faire dans le terminal : idf.py add-dependency "espressif/servo^0.1.0"
+        servo_config_t servo_cfg = {
+        .max_angle = 180,
+        .min_width_us = 500,
+        .max_width_us = 2500,
+        .freq = 50,
+        .timer_number = LEDC_TIMER_0,
+        .channels = {
+            .servo_pin = {
+                PIN_Servo1,
+            },
+            .ch = {
+                LEDC_CHANNEL_0,
+            },
+        },
+        .channel_number = 1,
+    };
 
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, TOF_FORWARD, PCA9685_HIGH));
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, TOF_BACKWARD, PCA9685_HIGH));
+    // Initialize the servo
+    iot_servo_init(LEDC_LOW_SPEED_MODE, &servo_cfg);
 
-    vTaskDelay(pdMS_TO_TICKS(150));
-/*
-    VL53L7CX_Configuration sensor;
-    VL53L7CX_ResultsData results;
+    //set the angle
+    uint16_t angle = 0;
+    iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle); 
 
-    vl53l7cx_init(&sensor);
+}
 
-    vl53l7cx_set_resolution(&sensor, VL53L7CX_RESOLUTION_4X4);
-    vl53l7cx_start_ranging(&sensor);
+void moveServomoteur(float angle) //https://docs.espressif.com/projects/esp-iot-solution/en/latest/motor/servo.html
+{
+    iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
+}
 
-    while (true)
+void zero_bleu()  { /* à faire */ }
+void zero_jaune() { /* we can do it */ }
+void one_bleu()  { /* à faire */ }
+void one_jaune() { /* we can do it */ }
+void two_bleu()  { /* à faire */ }
+void two_jaune() { /* we can do it */ }
+void trois_bleu()  { /* à faire */ }
+void trois_jaune() { /* we can do it */ }
+void vier_bleu()  { /* à faire */ }
+void vier_jaune() { /* we can do it */ }
+void five_bleu()  { /* à faire */ }
+void five_jaune() { /* we can do it */ }
+void ninja_bleu()  { /* à faire */ }
+void ninja_jaune() { /* we can do it */ }
+
+int stratPami(const int numPami, const int equipe)  //stratégie de déplacement des PAMI en fonction de leur num ET equipe
+{
+    switch (numPami)
     {
-        uint8_t ready = 0;
-
-        vl53l7cx_check_data_ready(&sensor, &ready);
-
-        if (ready)
-        {
-            vl53l7cx_get_ranging_data(&sensor, &results);
-
-            printf("Center: %d mm\n", results.distance_mm[5]);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(50));
+    case 0:
+        if (equipe==0){  // 0 pour équipe jaune
+        zero_bleu();}
+        else{  // 1 équipe jaune
+        zero_jaune();}
+        break;
+    case 1:
+        if (equipe==0){
+        one_bleu();}
+        else{ 
+        one_jaune();}
+        break;
+    case 2:
+        if (equipe==0){
+        two_bleu();}
+        else{ 
+        two_jaune();}
+        break;
+    case 3:
+        if (equipe==0){
+        trois_bleu();}
+        else{ 
+        trois_jaune();}
+        break;
+    case 4:
+        if (equipe==0){
+        vier_bleu();}
+        else{ 
+        vier_jaune();}
+        break;
+    case 5:
+        if (equipe==0){
+        five_bleu();}
+        else{ 
+        five_jaune();}
+        break;
+    default: //PAMI ninja (numéro 6 = 7e PAMI)
+        if (equipe==0){
+        ninja_bleu();}
+        else{ 
+        ninja_jaune();}
+        break;
     }
-*/
+    return 0;
+}
 
-/*
+extern "C" void app_main()
+{
+    gpio_reset_pin(PIN_TIRETTE);
+    gpio_reset_pin(PIN_EQUIPE);
+    gpio_reset_pin(PIN_PAMI_0);
+    gpio_reset_pin(PIN_PAMI_1);
+    gpio_reset_pin(PIN_PAMI_2);
+    gpio_set_direction(PIN_TIRETTE, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_EQUIPE, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_0, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_1, GPIO_MODE_INPUT);
+    gpio_set_direction(PIN_PAMI_2, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(PIN_TIRETTE, GPIO_PULLDOWN_ONLY);
 
-    // Turn the left wheel forward
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, LEFT_MOTOR_FORWARD, PCA9685_HIGH));
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, LEFT_MOTOR_BACKWARD, PCA9685_LOW));
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, LEFT_MOTOR_PWM, 2000));
-
-    // Turn the right wheel forward
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, RIGHT_MOTOR_FORWARD, PCA9685_HIGH));
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, RIGHT_MOTOR_BACKWARD, PCA9685_LOW));
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, RIGHT_MOTOR_PWM, 2000));
 
 
-    // Turn on the driver
-    ESP_ERROR_CHECK(pca9685_set_pwm_value(&dev, DRIVER_STBY, PCA9685_HIGH));
+    initServomoteur();
+    //lire la config (équipe + ID PAMI)
+    int equipe  = gpio_get_level(PIN_EQUIPE);
+    int numPami  = calNumPami();
+
+    printf("Équipe : %d, PAMI n°%d\n",equipe, numPami);
+
+    //démarrage du clock
+    Clock clock;
+    clock.restart();   //t=0
+
+    while (!(gpio_get_level(PIN_TIRETTE) == 0)) //à changer en fonction de qd active low ou high
+    {
+        vTaskDelay(pdMS_TO_TICKS(10));    //lié à FreeRTOS, fonction pdMS_TO_TICKS utilisée dans Odometry.cpp  
+                            //pour comprendre : https://freertos.org/Documentation/02-Kernel/04-API-references/02-Task-control/01-vTaskDelay
+    }
+
+    clock.restart();    //on remet t=0, début attente des 85.5s
+    printf("Départ du grand et beau robot, début attente PAMIs\n");
+
+    bool vroumMoteurs = false; //au début, les moteurs ne sont pas lancés
+    bool tourneServo = false; //de mm, flag pour faire tourner l'actionneur
 
 
     while (1)
     {
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-*/
+        float t=clock.getElapsedTime(); //temps en s
 
-}
+        //A 80.5s
+        if (!vroumMoteurs && t >= T_ATTENTE)
+        {
+            vroumMoteurs = true; //lancement des moteurs
+            lancerMoteurs();
+            stratPami(numPami, equipe);
+        }
 
-static uint8_t s_led_state = 0;
+        //A 90s
+        if (!tourneServo && t >= T_ServoMoteur)
+        {
+            tourneServo = true;
+            moveServomoteur(0);
+            printf("Curseur en mouvement ? il faut être bien placé\n");
+        }
 
+        //A 100s
+        if (t >= T_ARRET)
+        {
+            arreterMoteurs();
+            printf("FIN du match, PAMI hopefully dans le garde manger\n");
+            moveServomoteur(0);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            moveServomoteur(180);
+            vTaskDelay(pdMS_TO_TICKS(500));
 
-Codewheel codewheel_right(RIGHT_CODEWHEEL_A, RIGHT_CODEWHEEL_B);
+        }
 
-Codewheel codewheel_left(LEFT_CODEWHEEL_B, LEFT_CODEWHEEL_A);
-
-extern "C" void app_main(void)
-{
-
-    // Init i2cdev library
-    ESP_ERROR_CHECK(i2cdev_init());
-
-    //xTaskCreatePinnedToCore(dc_test, TAG, configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL, 0);
-    //xTaskCreatePinnedToCore(codewheels_tests, TAG, configMINIMAL_STACK_SIZE * 10, NULL, 5, NULL, 0);
-/*
-    codewheel_right.init();
-
-    codewheel_left.init();
-    codewheel_right.setWheelRadius(25.172188481);
-
-    codewheel_left.setWheelRadius(25.172188481);
-    codewheel_left.setCountsPerRev(3840);
-    codewheel_right.setCountsPerRev(3840);
-
-    Odometry::init(codewheel_left,codewheel_right,80);
-*/
-    gpio_reset_pin(TIRRETTE);
-    gpio_reset_pin(TEAM);
-    gpio_reset_pin(B0);
-    gpio_reset_pin(B1);
-    gpio_reset_pin(B2);
-    gpio_set_direction(TIRRETTE, GPIO_MODE_INPUT);
-    gpio_set_direction(TEAM, GPIO_MODE_INPUT);
-    gpio_set_direction(B0, GPIO_MODE_INPUT);
-    gpio_set_direction(B1, GPIO_MODE_INPUT);
-    gpio_set_direction(B2, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(TIRRETTE, GPIO_PULLDOWN_ONLY);
-
-
-    while(true){
-        //Position p = Odometry::getPosition();
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-        printf("Level Tirette = %i\tTEAM = %i\tB0 = %i\tB1 = %i\tB2 = %i\n",gpio_get_level(TIRRETTE),gpio_get_level(TEAM), gpio_get_level(B0), gpio_get_level(B1), gpio_get_level(B2));
-        //printf("%f,%f, %f \n",p.x,p.y, p.theta);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
