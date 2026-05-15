@@ -13,6 +13,7 @@
            idf.py build    */
 //ne pas oublier les sous modules : https://git-scm.com/book/fr/v2/Utilitaires-Git-Sous-modules
 
+#include ""
 #include "../components//clock/include/Clock.h"
 #include "iot_servo.h"
 #include "driver/gpio.h"
@@ -98,6 +99,7 @@ void moveServomoteur(float angle) //https://docs.espressif.com/projects/esp-iot-
 {
     iot_servo_write_angle(LEDC_LOW_SPEED_MODE, 0, angle);
 }
+//position init des pamis :  jaune
 
 void zero_bleu()  { /* à faire */ }
 void zero_jaune() { /* we can do it */ }

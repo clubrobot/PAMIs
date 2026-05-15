@@ -1,2 +1,5 @@
-idf_component_register(SRCS "main.cpp" "tempMarion.cpp"
-                       INCLUDE_DIRS ".")
+idf_component_register(
+    SRCS
+        "main.cpp"
+        "tempTestPourVictor.cpp"
+    INCLUDE_DIRS ".")

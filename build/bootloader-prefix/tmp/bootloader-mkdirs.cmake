@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 file(MAKE_DIRECTORY
-  "/home/marionlh/.espressif/v6.0/esp-idf/components/bootloader/subproject"
+  "/home/marionlh/esp/esp-idf-v5.3/components/bootloader/subproject"
   "/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader"
   "/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix"
   "/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader-prefix/tmp"

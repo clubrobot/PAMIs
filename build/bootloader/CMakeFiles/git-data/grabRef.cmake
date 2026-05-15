@@ -18,7 +18,7 @@ set(HEAD_HASH)
 file(READ "/home/marionlh/Desktop/ClubRobot_infoPAMI/test_temp/PAMIs/build/bootloader/CMakeFiles/git-data/HEAD" HEAD_CONTENTS LIMIT 1024)
 
 string(STRIP "${HEAD_CONTENTS}" HEAD_CONTENTS)
-set(GIT_DIR "/home/marionlh/.espressif/v6.0/esp-idf/.git")
+set(GIT_DIR "/home/marionlh/esp/esp-idf-v5.3/.git")
 # handle git-worktree
 if(EXISTS "${GIT_DIR}/commondir")
 	file(READ "${GIT_DIR}/commondir" GIT_DIR_NEW LIMIT 1024)
